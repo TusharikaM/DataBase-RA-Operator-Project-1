@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
 
+
 import static java.lang.Boolean.*;
 import static java.lang.System.out;
 
@@ -76,8 +77,8 @@ public class Table
     {
         switch (mType) {
         case TREE_MAP:    return new TreeMap <> ();
-        case LINHASH_MAP: return new LinHashMap <> (KeyType.class, Comparable [].class);
-        case BPTREE_MAP:  return new BpTreeMap <> (KeyType.class, Comparable [].class);
+//        case LINHASH_MAP: return new LinHashMap <> (KeyType.class, Comparable [].class);
+//        case BPTREE_MAP:  return new BpTreeMap <> (KeyType.class, Comparable [].class);
         default:          return null;
         } // switch
     } // makeMap
@@ -190,17 +191,30 @@ public class Table
      *
      * @param keyVal  the given key value
      * @return  a table with the tuple satisfying the key predicate
+     * @author Radhika Bhavsar 
      */
-    public Table select (KeyType keyVal)
-    {
-        out.println ("RA> " + name + ".select (" + keyVal + ")");
+	public Table select(KeyType keyVal) {
+		out.println("RA> " + name + ".select (" + keyVal + ")");
 
-        List <Comparable []> rows = new ArrayList <> ();
+		List<Comparable[]> rows = new ArrayList<>();
 
-        //  T O   B E   I M P L E M E N T E D 
-
-        return new Table (name + count++, attribute, domain, key, rows);
-    } // select
+		// if Index is used, simply retrieve the value based on the input key 
+		if (mType != MapType.NO_MAP) {
+			if(index.get(keyVal)!=null) rows.add(index.get(keyVal)); 
+		}
+		// if No Index has been specified, iterate through each tuple and add those 
+		// tuples to the rows that satisfy the input key
+		else {
+			tuples.forEach(t -> {
+				for (int i = 0; i < attribute.length; i++) {
+					if (new KeyType(t[i].toString()).equals(keyVal)) {
+						rows.add(t);
+					}
+				}
+			});
+		}  
+		return new Table(name + count++, attribute, domain, key, rows);
+	} // select
 
     /************************************************************************************
      * Union this table and table2.  Check that the two tables are compatible.
