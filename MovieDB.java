@@ -120,6 +120,11 @@ class MovieDB
         out.println ();
         var t_iselect = movieStar.select (new KeyType ("Harrison_Ford"));
         t_iselect.print ();
+        
+      //--------------------- Simple select
+        out.println ();
+        var t_iselect1 = movieStar.select (t -> t[movieStar.col("name")].equals ("Harrison_Ford"));
+        t_iselect.print ();
 
         //--------------------- union: movie UNION cinema
 
