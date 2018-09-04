@@ -122,9 +122,9 @@ class MovieDB
         t_iselect.print ();
         
       //--------------------- Simple select
-        out.println ();
+        out.println ();  
         var t_iselect1 = movieStar.select (t -> t[movieStar.col("name")].equals ("Harrison_Ford"));
-        t_iselect.print ();
+        t_iselect1.print ();
 
         //--------------------- union: movie UNION cinema
 

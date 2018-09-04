@@ -1,4 +1,3 @@
-package project1;
 
 /****************************************************************************************
  * @file  Table.java
@@ -197,26 +196,33 @@ public class Table
      * @author Radhika Bhavsar 
      */
 	public Table select(KeyType keyVal) {
-		out.println("RA> " + name + ".select (" + keyVal + ")");
 
 		List<Comparable[]> rows = new ArrayList<>();
+		try {
+			out.println("RA> " + name + ".select (" + keyVal + ")");
+			// if Index is used, simply retrieve the value based on the input key
+			if (mType != MapType.NO_MAP) {
+				if (index.get(keyVal) != null)
+					rows.add(index.get(keyVal));
+			}
+			// if No Index has been specified, iterate through each tuple and add those
+			// tuples to the rows that satisfy the input key
+			else {
 
-		// if Index is used, simply retrieve the value based on the input key 
-		if (mType != MapType.NO_MAP) {
-			if(index.get(keyVal)!=null) rows.add(index.get(keyVal)); 
-		}
-		// if No Index has been specified, iterate through each tuple and add those 
-		// tuples to the rows that satisfy the input key
-		else {
-			tuples.forEach(t -> {
-				for (int i = 0; i < attribute.length; i++) {
-					if (new KeyType(t[i].toString()).equals(keyVal)) {
-						rows.add(t);
+				tuples.forEach(t -> {
+					for (int i = 0; i < attribute.length; i++) {
+						if (new KeyType(t[i].toString()).equals(keyVal)) {
+							rows.add(t);
+						}
 					}
-				}
-			});
-		}  
+				});
+			}
+
+		} catch (Exception e) {
+			System.err.println("Something went wrong. Please try again. Key might be null ");
+		}
 		return new Table(name + count++, attribute, domain, key, rows);
+
 	} // select
     /************************************************************************************
      * Union this table and table2.  Check that the two tables are compatible.
