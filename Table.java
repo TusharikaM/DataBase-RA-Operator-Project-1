@@ -68,7 +68,7 @@ public class Table
 
     /** The map type to be used for indices.  Change as needed.
      */
-    private static final MapType mType = MapType.TREE_MAP;
+    private static final MapType mType = MapType.NO_MAP;
 
     /************************************************************************************
      * Make a map (index) given the MapType.
@@ -282,21 +282,43 @@ public class Table
      * @param attribute2  the attributes of table2 to be compared (Primary Key)
      * @param table2      the rhs table in the join operation
      * @return  a table with tuples satisfying the equality predicate
+     * @author Hiten Nirmal
+     * @author Niyati Shah
      */
     public Table join (String attributes1, String attributes2, Table table2)
     {
         out.println ("RA> " + name + ".join (" + attributes1 + ", " + attributes2 + ", "
                                                + table2.name + ")");
-
-        var t_attrs = attributes1.split (" ");
-        var u_attrs = attributes2.split (" ");
+        String[] t_attrs = attributes1.split (" ");
+        String[] u_attrs = attributes2.split (" "); 
         var rows    = new ArrayList <Comparable []> ();
-
-        //  T O   B E   I M P L E M E N T E D 
-
+        //take tuples from both the table and find common elements
+        // if common element is found then add that tuple to the table
+        // common elements are found by calling a method
+        this.tuples.stream().forEach(items->
+        {
+        	table2.tuples.stream().forEach(i->
+        	{
+        		if(checkCommonElements(items,i,t_attrs,u_attrs, table2))
+        		{       			
+        			rows.add(ArrayUtil.concat(items,i));		
+        		}
+        	});
+        });      
+        //Disambiguate attribute names by append "1" to the end of any duplicate attribute name.
+        for(int i=0;i<attribute.length;i++)
+        {
+        	for(int j=0;j<table2.attribute.length;j++)
+        	{
+        		if (attribute[i].equals(table2.attribute[j]))
+        		{
+        			attribute[i]=attribute[i]+"1";
+        		}
+        	}
+      }
         return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
                                           ArrayUtil.concat (domain, table2.domain), key, rows);
-    } // join
+       } // join
 
     /************************************************************************************
      * Join this table and table2 by performing an "equi-join".  Same as above, but implemented
@@ -335,19 +357,43 @@ public class Table
      *
      * @param table2  the rhs table in the join operation
      * @return  a table with tuples satisfying the equality predicate
+     * @author Hiten Nirmal 
+     * @author Niyati Shah
      */
     public Table join (Table table2)
     {
-        out.println ("RA> " + name + ".join (" + table2.name + ")");
-
+       out.println ("RA> " + name + ".join (" + table2.name + ")");
         var rows = new ArrayList <Comparable []> ();
-
-        //  T O   B E   I M P L E M E N T E D 
-
-        // FIX - eliminate duplicate columns
-        return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
-                                          ArrayUtil.concat (domain, table2.domain), key, rows);
-    } // join
+        List<String> newTable2Attrs = new ArrayList<String>();
+        List<String> matchingColumns = new ArrayList<String>();
+       // Checking if the two tables have any attributes in common and putting the matching attributes in one list and rest attributes in other list
+        //newTable2Attrs contain unmatched attributes and matchingColumns have matching attributes
+        for (String attr_t2: table2.attribute) {
+        	if (!Arrays.asList(this.attribute).contains(attr_t2)) {
+        		newTable2Attrs.add(attr_t2);
+        	}else {
+        		matchingColumns.add(attr_t2);
+        	}
+        }
+        System.out.println("matching attributes********** "+ matchingColumns);
+        System.out.println("unmatching attributes********** "+ newTable2Attrs);
+        //for each tuple in table1: it is checking all the tuples in table2 and if the matching attributes have same element in both table, 
+        //this is done by calling the method checkCommonElements which returns the boolean value.
+        //then it extracts the tuple from table1 and and the tuple from table2 except for the uncommon attributes. 
+        this.tuples.stream().forEach(items->
+        {
+        	table2.tuples.stream().forEach(i->
+        	{
+        		if(checkCommonElements(items,i,matchingColumns))
+        		{	
+        			rows.add(ArrayUtil.concat(items, table2.extract(i,newTable2Attrs.toArray(new String[newTable2Attrs.size()]))));			
+        		}
+        	});
+        });      
+        //done FIXing - eliminating duplicate columns
+        return new Table (name + count++, ArrayUtil.concat (attribute, newTable2Attrs.toArray(new String [newTable2Attrs.size()])),
+        		ArrayUtil.concat (domain, table2.domain), key, rows);
+        } // join
 
     /************************************************************************************
      * Return the column position for the given attribute name.
@@ -595,5 +641,67 @@ public class Table
 
         return obj;
     } // extractDom
-
+    /************************************************************************************
+     * Compare two tuples 
+     *
+     * @param 'a' elements of this tuple
+     * @param 'b' elements of second table tuple;
+     * @param 'c' matching attribute
+     * @return boolean value- true or false
+     * @author Hiten Nirmal
+     * @author Niyati Shah
+     */
+    public boolean checkCommonElements(Comparable[] a, Comparable b[], List<String> c)
+    {
+	   //This method is used of checking the element of matching attributed in both the tables and if the attributes 
+       //are same it returns true else false.
+	   Comparable[] extract1;
+	   extract1 = extract(a,c.toArray(new String[c.size()]));
+	   Comparable[] extract2;
+	   extract2 = extract(b,c.toArray(new String[c.size()]));
+	   if (c.size() == 0) {
+		   return false;
+		   }
+	   for(int i=0;i<extract1.length;i++)
+	   {
+		   if(extract1[i].equals(extract2[i]))
+			   continue;
+		   else
+			  return false;
+	   }
+	   return true;
+    }
+  
+    /************************************************************************************
+     * Compare two tuples 
+     *
+     * @param 'a' elements of this tuple
+     * @param 'b' elements of second table tuple;
+     * @param 't_attrs' attribute key 1
+     * @param 'u_attrs' attribute key 2
+     * @param  'table2' importing table2 
+     * @return @return boolean value- true or false
+     * @author Hiten Nirmal
+     * @author Niyati Shah
+     */
+    
+    public boolean checkCommonElements(Comparable[] a, Comparable b[], String[] t_attrs, String[] u_attrs, Table table2)
+    {
+	   Comparable[] extract1;
+	   extract1 = extract(a,t_attrs);  
+	   Comparable[] extract2;
+	   extract2 = table2.extract(b,u_attrs);
+	   //if (c.size() == 0) {
+		 //  return false;
+		   //}
+	   for(int i=0;i<extract1.length;i++)
+	   {
+		   if(extract1[i].equals(extract2[i]))
+			   continue;
+		   else
+			  return false;
+	   }
+	   return true;
+    }
+    
 } // Table class
