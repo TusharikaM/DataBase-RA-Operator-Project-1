@@ -712,4 +712,14 @@ public class Table
 	   return true;
     }
     
+    public int getTableLength()
+    {
+    	return tuples.size();
+    }
+    
+    public Comparable[] getTuple(int index)
+    {
+    	return tuples.get(index);
+    }//get tuple for unit testing
+    
 } // Table class
