@@ -270,7 +270,7 @@ public class Table
         //3. use foreach to add tuples of table 1 which are not present in table 2
         //4. filter tuples from table1 and table2
         // R1 - (R1 interesection R2)    
-         if (!compatible (table2)) return new Table (name + count++, attribute, domain, key, rows);
+         if (!compatible (table2)) return null;
         this.tuples.stream().filter(item -> !(table2.tuples.contains(item)))
                          .forEach(item -> rows.add(item));
         return new Table (name + count++, attribute, domain, key, rows);
