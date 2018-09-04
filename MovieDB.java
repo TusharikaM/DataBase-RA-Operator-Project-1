@@ -128,15 +128,23 @@ class MovieDB
 
         //--------------------- union: movie UNION cinema
 
-        out.println ();
-        var t_union = movie.union (cinema);
-        t_union.print ();
+		out.println();
+		var t_union = movie.union(cinema);
+		try {
+			t_union.print();
+		} catch (Exception e) {
+			System.out.println("The tables are not compatible to perform union operation");
+		}
+		// --------------------- minus: movie MINUS cinema
 
-        //--------------------- minus: movie MINUS cinema
+		out.println();
+		var t_minus = movie.minus(cinema);
 
-        out.println ();
-        var t_minus = movie.minus (cinema);
-        t_minus.print ();
+		try {
+			t_minus.print();
+		} catch (Exception e) {
+			System.out.println("The tables are not compatible to perform union operation");
+		}
 
         //--------------------- equi-join: movie JOIN studio ON studioName = name
 
