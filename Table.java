@@ -1,3 +1,4 @@
+package project1;
 
 /****************************************************************************************
  * @file  Table.java
@@ -9,7 +10,6 @@ import java.io.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
-
 
 import static java.lang.Boolean.*;
 import static java.lang.System.out;
@@ -77,8 +77,8 @@ public class Table
     {
         switch (mType) {
         case TREE_MAP:    return new TreeMap <> ();
-//        case LINHASH_MAP: return new LinHashMap <> (KeyType.class, Comparable [].class);
-//        case BPTREE_MAP:  return new BpTreeMap <> (KeyType.class, Comparable [].class);
+        //case LINHASH_MAP: return new LinHashMap <> (KeyType.class, Comparable [].class);
+        //case BPTREE_MAP:  return new BpTreeMap <> (KeyType.class, Comparable [].class);
         default:          return null;
         } // switch
     } // makeMap
@@ -153,6 +153,7 @@ public class Table
      *
      * @param attributes  the attributes to project onto
      * @return  a table of projected tuples
+     * @author Gibson Foss
      */
     public Table project (String attributes)
     {
@@ -162,8 +163,10 @@ public class Table
         var newKey    = (Arrays.asList (attrs).containsAll (Arrays.asList (key))) ? key : attrs;
 
         List <Comparable []> rows = new ArrayList <> ();
-
-        //  T O   B E   I M P L E M E N T E D 
+        // Take a stream of tuples for the given table and then extract that attributes and that particular tuple using -
+        // pre-made extraction method provided by Dr. Miller.
+        
+        this.tuples.stream().forEach(element -> rows.add(extract(element, attrs)));
 
         return new Table (name + count++, attrs, colDomain, newKey, rows);
     } // project
@@ -215,7 +218,6 @@ public class Table
 		}  
 		return new Table(name + count++, attribute, domain, key, rows);
 	} // select
-
     /************************************************************************************
      * Union this table and table2.  Check that the two tables are compatible.
      *
@@ -223,17 +225,23 @@ public class Table
      *
      * @param table2  the rhs table in the union operation
      * @return  a table representing the union
+     * @author Niyati Shah
      */
-    public Table union (Table table2)
+	public Table union (Table table2)
     {
         out.println ("RA> " + name + ".union (" + table2.name + ")");
         if (! compatible (table2)) return null;
 
         List <Comparable []> rows = new ArrayList <> ();
-
-        //  T O   B E   I M P L E M E N T E D 
-
+        //union with duplicate tuples
+       // Stream.concat(this.tuples.stream(), table2.tuples.stream()).collect(Collectors.toList()).stream().forEach(item -> rows.add(item));
+        //union with no duplicate tuples
+        //adding tuples of the 1st table in the new table using for each loop 
+        this.tuples.stream().forEach(items -> rows.add(items));
+        //adding tuples from the second table and checking that the tuple in the second table doesnt match the tuple in the first table, if it matches filtering out those tuple
+        table2.tuples.stream().filter(item -> !(this.tuples.contains(item))) .forEach(item -> rows.add(item));
         return new Table (name + count++, attribute, domain, key, rows);
+        
     } // union
 
     /************************************************************************************
@@ -244,16 +252,21 @@ public class Table
      *
      * @param table2  The rhs table in the minus operation
      * @return  a table representing the difference
+     * @author Tusharika Mishra
      */
     public Table minus (Table table2)
     {
         out.println ("RA> " + name + ".minus (" + table2.name + ")");
-        if (! compatible (table2)) return null;
-
         List <Comparable []> rows = new ArrayList <> ();
-
-        //  T O   B E   I M P L E M E N T E D 
-
+        //1. If table types are not similar , it results to NullPointer Exception
+       // if (! compatible (table2)) return null;
+        //2. check if they are union compatible
+        //3. use foreach to add tuples of table 1 which are not present in table 2
+        //4. filter tuples from table1 and table2
+        // R1 - (R1 interesection R2)    
+         if (!compatible (table2)) return new Table (name + count++, attribute, domain, key, rows);
+        this.tuples.stream().filter(item -> !(table2.tuples.contains(item)))
+                         .forEach(item -> rows.add(item));
         return new Table (name + count++, attribute, domain, key, rows);
     } // minus
 
