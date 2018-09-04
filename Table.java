@@ -686,7 +686,9 @@ public class Table
      */
     
     public boolean checkCommonElements(Comparable[] a, Comparable b[], String[] t_attrs, String[] u_attrs, Table table2)
-    {
+    {	
+      //This method is used of checking the element of matching attributed in both the tables and if the attributes 
+      //are same it returns true else false.
 	   Comparable[] extract1;
 	   extract1 = extract(a,t_attrs);  
 	   Comparable[] extract2;
