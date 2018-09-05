@@ -98,7 +98,7 @@ class MovieDB
         //--------------------- project: title year
 
         out.println ();
-        var t_project = movie.project ("title year studio");
+        var t_project = movie.project ("title year");
         try {
         	t_project.print ();
         }
