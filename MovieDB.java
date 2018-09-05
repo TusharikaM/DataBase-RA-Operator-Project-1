@@ -1,4 +1,3 @@
-
 /*****************************************************************************************
  * @file  MovieDB.java
  *
@@ -99,8 +98,14 @@ class MovieDB
         //--------------------- project: title year
 
         out.println ();
-        var t_project = movie.project ("title year");
-        t_project.print ();
+        var t_project = movie.project ("title year studio");
+        try {
+        	t_project.print ();
+        }
+        catch(Exception e)
+        {
+        	System.out.println("The attributes are not present in the table");
+        }
 
         //--------------------- select: equals, &&
 
@@ -161,4 +166,3 @@ class MovieDB
     } // main
 
 } // MovieDB class
-
