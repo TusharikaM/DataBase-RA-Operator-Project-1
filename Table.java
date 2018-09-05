@@ -156,18 +156,34 @@ public class Table
      */
     public Table project (String attributes)
     {
-        out.println ("RA> " + name + ".project (" + attributes + ")");
-        var attrs     = attributes.split (" ");
-        var colDomain = extractDom (match (attrs), domain);
-        var newKey    = (Arrays.asList (attrs).containsAll (Arrays.asList (key))) ? key : attrs;
+		out.println("RA> " + name + ".project (" + attributes + ")");
+		var attrs = attributes.split(" ");
+		List<String> finalAttributes = new ArrayList<>();
+		var orinalArrtibutes = attribute.toString().split(" ");
+		Set<String> set = new TreeSet<>();
+		for (int i = 0; i < attribute.length; i++)
+			set.add(attribute[i]);
 
-        List <Comparable []> rows = new ArrayList <> ();
-        // Take a stream of tuples for the given table and then extract that attributes and that particular tuple using -
-        // pre-made extraction method provided by Dr. Miller.
-        
-        this.tuples.stream().forEach(element -> rows.add(extract(element, attrs)));
+		for (int i = 0; i < attrs.length; i++) {
+			if (!set.contains(attrs[i])) {
+				System.err.println("No domain found for :" + attrs[i]);
+			} else {
+				finalAttributes.add(attrs[i]);
+			}
+		}
 
-        return new Table (name + count++, attrs, colDomain, newKey, rows);
+		String[] stringArray = finalAttributes.toArray(new String[0]);
+		var colDomain = extractDom(match(stringArray), domain);
+		var newKey = (Arrays.asList(stringArray).containsAll(Arrays.asList(key))) ? key : attrs;
+
+		List<Comparable[]> rows = new ArrayList<>();
+		// Take a stream of tuples for the given table and then extract that attributes
+		// and that particular tuple using -
+		// pre-made extraction method provided by Dr. Miller.
+
+		this.tuples.stream().forEach(element -> rows.add(extract(element, stringArray)));
+
+		return new Table(name + count++, stringArray, colDomain, newKey, rows);
     } // project
 
     /************************************************************************************
@@ -665,9 +681,6 @@ public class Table
 	   extract1 = extract(a,c.toArray(new String[c.size()]));
 	   Comparable[] extract2;
 	   extract2 = extract(b,c.toArray(new String[c.size()]));
-	   if (c.size() == 0) {
-		   return false;
-		   }
 	   for(int i=0;i<extract1.length;i++)
 	   {
 		   if(extract1[i].equals(extract2[i]))
