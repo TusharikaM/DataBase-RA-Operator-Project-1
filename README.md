@@ -3,7 +3,7 @@ Finish the implementation the 5 RA Operators that are partially implemented in T
 
 Implemented Relational Operators in Java - Selcect, Project, Union, Minus.
 Team Memebers- 
-# Tusharika Mishra
-# Hiten Nirmal
-# Niyati Shah
-# Gibson Foss
+## Tusharika Mishra
+## Hiten Nirmal
+## Niyati Shah
+## Gibson Foss
